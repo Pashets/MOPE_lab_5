@@ -23,18 +23,19 @@ def replace_column(list_: list, column, list_replace):
     return list_
 
 
-def append_to_list_x(x: list):
+def append_to_list_x(x: list, norm=0):
     for i in range(len(x)):
-        x[i].append(x[i][0] * x[i][1])
-        x[i].append(x[i][0] * x[i][2])
-        x[i].append(x[i][1] * x[i][2])
-        x[i].append(x[i][0] * x[i][1] * x[i][2])
-        x[i].append(x[i][0] * x[i][0])
-        x[i].append(x[i][1] * x[i][1])
-        x[i].append(x[i][2] * x[i][2])
+        x[i].append(x[i][0 + norm] * x[i][1 + norm])
+        x[i].append(x[i][0 + norm] * x[i][2 + norm])
+        x[i].append(x[i][1 + norm] * x[i][2 + norm])
+        x[i].append(x[i][0 + norm] * x[i][1 + norm] * x[i][2 + norm])
+        x[i].append(x[i][0 + norm] * x[i][0 + norm])
+        x[i].append(x[i][1 + norm] * x[i][1 + norm])
+        x[i].append(x[i][2 + norm] * x[i][2 + norm])
         for j in range(len(x[i])):
             if round(x[i][j]) == 0:
                 x[i][j] = 0
+            x[i][j] = round(x[i][j], 3)
 
 
 def main(m, n):
@@ -44,26 +45,25 @@ def main(m, n):
             'ŷ = b0 + b1 * x1 + b2 * x2 + b3 * x3 + b12 * x1 * x2 + b13 * x1 * x3 + b23 * x2 * x3 + b123 * x1 * x2 * '
             'x3 + b11 * x1 * x1 + b22 * x2 * x2 + b33 * x3 * x3')
         norm_x = [
-            [-1, -1, -1],
-            [-1, +1, +1],
-            [+1, -1, +1],
-            [+1, +1, -1],
-            [-1, -1, +1],
-            [-1, +1, -1],
-            [+1, -1, -1],
-            [+1, +1, +1],
-            [-l, 0, 0],
-            [l, 0, 0],
-            [0, -l, 0],
-            [0, l, 0],
-            [0, 0, -l],
-            [0, 0, l],
-            [0, 0, 0]
+            [+1, -1, -1, -1],
+            [+1, -1, +1, +1],
+            [+1, +1, -1, +1],
+            [+1, +1, +1, -1],
+            [+1, -1, -1, +1],
+            [+1, -1, +1, -1],
+            [+1, +1, -1, -1],
+            [+1, +1, +1, +1],
+            [+1, -l, 0, 0],
+            [+1, l, 0, 0],
+            [+1, 0, -l, 0],
+            [+1, 0, l, 0],
+            [+1, 0, 0, -l],
+            [+1, 0, 0, l],
+            [+1, 0, 0, 0]
         ]
 
-        append_to_list_x(norm_x)
+        append_to_list_x(norm_x, norm=1)
 
-        print(*norm_x, sep='\n')
         x10 = (x1_min + x1_max) / 2
         x20 = (x2_min + x2_max) / 2
         x30 = (x3_min + x3_max) / 2
@@ -82,7 +82,8 @@ def main(m, n):
             [x10, x2_min * l, x30],
             [x10, x2_max * l, x30],
             [x10, x20, x3_min * l],
-            [x10, x20, x3_max * l]
+            [x10, x20, x3_max * l],
+            [x10, x20, x30]
         ]
 
         append_to_list_x(x)
@@ -143,6 +144,39 @@ def main(m, n):
 
     for i in range(len(y_av)):
         y_av[i] = round(y_av[i], 3)
+
+    if n == 15:
+
+        t = PrettyTable(['N', 'norm_x_0', 'norm_x_1', 'norm_x_2', 'norm_x_3', 'norm_x_1_x_2', 'norm_x_1_x_3',
+                         'norm_x_2_x_3', 'norm_x_1_x_2_x_3', 'norm_x_1_x_1', 'norm_x_2_x_2', 'norm_x_3_x_3', 'x_1',
+                         'x_2', 'x_3', 'x_1_x_2', 'x_1_x_3', 'x_2_x_3',
+                         'x_1_x_2_x_3', 'x_1_x_1', 'x_2_x_2', 'x_3_x_3'] + [f'y_{i + 1}' for i in range(m)] + ['y_av'])
+
+        for i in range(n):
+            t.add_row([i + 1] + list(norm_x[i]) + list(x[i]) + list(y[i]) + [y_av[i]])
+        print(t)
+
+        sums_of_columns_x = np.sum(x, axis=0)
+        m_ij = [[1] + [i for i in sums_of_columns_x]]
+        for i in range(len(sums_of_columns_x)):
+            m_ij.append(
+                [sums_of_columns_x[i]] + [sum([x[k][i] * x[k][j] for k in range(len(x[i]))]) for j in range(len(x[i]))])
+
+        k_i = [sum(y_av) / n]
+        for i in range(len(sums_of_columns_x)):
+            k_i.append(sum(y_av[j] * x[j][i] for j in range(len(x[i]))) / n)
+
+        det = np.linalg.det(m_ij)
+        det_i = [np.linalg.det(replace_column(m_ij, i, k_i)) for i in range(len(k_i))]
+
+        b_i = [i / det for i in det_i]
+
+        print(
+            f"\nThe normalized regression equation: y = {b_i[0]:.5f} + {b_i[1]:.5f} * x1 + {b_i[2]:.5f} * x2 + "
+            f"{b_i[3]:.5f} * x3 + {b_i[4]:.5f} * x1 * x2 + "
+            f"{b_i[5]:.5f} * x1 * x3 + {b_i[6]:.5f} * x2 * x3 + {b_i[7]:.5f} * x1 * x2 * x3 + {b_i[8]:.5f} * x1 * x1 + "
+            f"{b_i[9]:.5f} * x2 * x2 + {b_i[10]:.5f} * x3 * x3")
+
     if n == 8:
         t = PrettyTable(['N', 'norm_x_0', 'norm_x_1', 'norm_x_2', 'norm_x_3', 'norm_x_1_x_2', 'norm_x_1_x_3',
                          'norm_x_2_x_3', 'norm_x_1_x_2_x_3', 'x_1', 'x_2', 'x_3', 'x_1_x_2', 'x_1_x_3', 'x_2_x_3',
@@ -228,19 +262,31 @@ def main(m, n):
     s2_b = sum(s_i) / n
     s2_beta_s = s2_b / (n * m)
     s_beta_s = sqrt(s2_beta_s)
-
-    beta_i = [sum([norm_x[i][j] * y_av[i] for i in range(len(norm_x))]) / n for j in range(len(norm_x))]
+    beta_i = [sum([norm_x[i][j] * y_av[i] for i in range(len(norm_x))]) / n for j in range(len(norm_x[0]))]
 
     t = [abs(i) / s_beta_s for i in beta_i]
 
     f_3 = f_1 * f_2
     t_table = {8: 2.306, 9: 2.262, 10: 2.228, 11: 2.201, 12: 2.179, 13: 2.160, 14: 2.145, 15: 2.131, 16: 2.120,
-               17: 2.110, 18: 2.101, 19: 2.093, 20: 2.086, 21: 2.08, 22: 2.074, 23: 2.069, 24: 2.064, 25: 2.06}
+               17: 2.110, 18: 2.101, 19: 2.093, 20: 2.086, 21: 2.08, 22: 2.074, 23: 2.069, 24: 2.064, 25: 2.06,
+               28: 2.048, 30: 2.042, 32: 2.036, 36: 2.024, 40: 2.012, 44: 2.006, 48: 2}
     d = deepcopy(n)
     for i in range(len(t)):
         if t_table.get(f_3) > t[i]:
             beta_i[i] = 0
             d -= 1
+    if n == 15:
+        print(
+            f"\nThe normalized regression equation: y = {beta_i[0]:.5f} + {beta_i[1]:.5f} * x1 + "
+            f"{beta_i[2]:.5f} * x2 + {beta_i[3]:.5f} * x3 + {beta_i[4]:.5f} * x1 * x2 + "
+            f"{beta_i[5]:.5f} * x1 * x3 + {beta_i[6]:.5f} * x2 * x3 + {beta_i[7]:.5f} * x1 * x2 * x3 + "
+            f"{beta_i[8]:.5f} * x1 * x1 + {beta_i[9]:.5f} * x2 * x2 + {beta_i[10]:.5f} * x3 * x3")
+
+        check_i = [
+            beta_i[0] + beta_i[1] * i[0] + beta_i[2] * i[1] + beta_i[3] * i[2] + beta_i[4] * i[3] + beta_i[5] * i[4] +
+            beta_i[6] * i[5] + beta_i[7] * i[6] + beta_i[8] * i[7] + beta_i[9] * i[8] + beta_i[10] * i[9] for i in x]
+
+        print("Values are normalized: ", check_i)
     if n == 8:
         print(
             f"\nThe normalized regression equation: y = {beta_i[0]:.5f} + {beta_i[1]:.5f} * x1 + {beta_i[2]:.5f} * x2 + "
@@ -264,6 +310,7 @@ def main(m, n):
     s2_ad = m / f_4 * sum([(check_i[i] - y_av[i]) ** 2 for i in range(len(y_av))])
     f_p = s2_ad / s2_b
     f_t = [
+
         [164.4, 199.5, 215.7, 224.6, 230.2, 234, 235.8, 237.6],
         [18.5, 19.2, 19.2, 19.3, 19.3, 19.3, 19.4, 19.4],
         [10.1, 9.6, 9.3, 9.1, 9, 8.9, 8.8, 8.8],
@@ -289,6 +336,31 @@ def main(m, n):
         [4.3, 3.4, 3.1, 2.8, 2.6, 2.6, 2.3, 2.2],
         [4.3, 3.4, 3, 2.8, 2.6, 2.5, 2.3, 2.2],
         [4.3, 3.4, 3, 2.8, 2.6, 2.5, 2.3, 2.2],
+        [4.2, 3.4, 3, 2.7, 2.6, 2.5, 2.3, 2.2],
+        [4.2, 3.4, 3, 2.7, 2.6, 2.5, 2.3, 2.2],
+        [4.2, 3.3, 3, 2.7, 2.6, 2.4, 2.3, 2.1],
+        [4.2, 3.3, 3, 2.7, 2.6, 2.4, 2.3, 2.1],
+        [4.2, 3.3, 2.9, 2.7, 2.5, 2.4, 2.3, 2.1],
+        [4.2, 3.3, 2.9, 2.7, 2.5, 2.4, 2.3, 2.1],
+        [4.2, 3.3, 2.9, 2.7, 2.5, 2.4, 2.3, 2.1],
+        [4.2, 3.3, 2.9, 2.7, 2.5, 2.4, 2.3, 2.1],
+        [4.2, 3.3, 2.9, 2.7, 2.5, 2.4, 2.3, 2.1],
+        [4.2, 3.3, 2.9, 2.7, 2.5, 2.4, 2.3, 2.1],
+        [4.2, 3.3, 2.9, 2.7, 2.5, 2.4, 2.3, 2.1],
+        [4.2, 3.3, 2.9, 2.7, 2.5, 2.4, 2.3, 2.1],
+        [4.2, 3.3, 2.9, 2.7, 2.5, 2.4, 2.3, 2.1],
+        [4.2, 3.3, 2.9, 2.7, 2.5, 2.4, 2.3, 2.1],
+        [4.1, 3.2, 2.9, 2.6, 2.5, 2.3, 2.3, 2],
+        [4.1, 3.2, 2.9, 2.6, 2.5, 2.3, 2.3, 2],
+        [4.1, 3.2, 2.9, 2.6, 2.5, 2.3, 2.3, 2],
+        [4.1, 3.2, 2.9, 2.6, 2.5, 2.3, 2.3, 2],
+        [4.1, 3.2, 2.9, 2.6, 2.5, 2.3, 2.3, 2],
+        [4.1, 3.2, 2.9, 2.6, 2.5, 2.3, 2.3, 2],
+        [4.1, 3.2, 2.9, 2.6, 2.5, 2.3, 2.3, 2],
+        [4.1, 3.2, 2.9, 2.6, 2.5, 2.3, 2.3, 2],
+        [4.1, 3.2, 2.9, 2.6, 2.5, 2.3, 2.3, 2],
+        [4.1, 3.2, 2.9, 2.6, 2.5, 2.3, 2.3, 2]
+
     ]
     if f_p > f_t[f_3][f_4]:
         print(
