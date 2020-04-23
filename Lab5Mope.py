@@ -23,17 +23,25 @@ def replace_column(list_: list, column, list_replace):
     return list_
 
 
-def append_to_list_x(x: list, norm=0):
+def append_to_list_x(x: list, variant: int):
+    if variant == 1:
+        for i in range(len(x)):
+            x[i].append(x[i][1] * x[i][2])
+            x[i].append(x[i][1] * x[i][3])
+            x[i].append(x[i][2] * x[i][3])
+            x[i].append(x[i][1] * x[i][2] * x[i][3])
+    if variant == 2:
+        for i in range(len(x)):
+            x[i].append(x[i][1] * x[i][2])
+            x[i].append(x[i][1] * x[i][3])
+            x[i].append(x[i][2] * x[i][3])
+            x[i].append(x[i][1] * x[i][2] * x[i][3])
+            x[i].append(x[i][1] * x[i][1])
+            x[i].append(x[i][2] * x[i][2])
+            x[i].append(x[i][3] * x[i][3])
     for i in range(len(x)):
-        x[i].append(x[i][0 + norm] * x[i][1 + norm])
-        x[i].append(x[i][0 + norm] * x[i][2 + norm])
-        x[i].append(x[i][1 + norm] * x[i][2 + norm])
-        x[i].append(x[i][0 + norm] * x[i][1 + norm] * x[i][2 + norm])
-        x[i].append(x[i][0 + norm] * x[i][0 + norm])
-        x[i].append(x[i][1 + norm] * x[i][1 + norm])
-        x[i].append(x[i][2 + norm] * x[i][2 + norm])
         for j in range(len(x[i])):
-            if round(x[i][j]) == 0:
+            if round(x[i][j], 3) == 0:
                 x[i][j] = 0
             x[i][j] = round(x[i][j], 3)
 
@@ -49,7 +57,7 @@ def get_value(table: dict, key: int):
 
 def main(m, n):
     if n == 15:
-        l = 1.215
+        const_l = 1.215
         print(
             'ŷ = b0 + b1 * x1 + b2 * x2 + b3 * x3 + b12 * x1 * x2 + b13 * x1 * x3 + b23 * x2 * x3 + b123 * x1 * x2 * '
             'x3 + b11 * x1 * x1 + b22 * x2 * x2 + b33 * x3 * x3')
@@ -62,16 +70,14 @@ def main(m, n):
             [+1, -1, +1, -1],
             [+1, +1, -1, -1],
             [+1, +1, +1, +1],
-            [+1, -l, 0, 0],
-            [+1, l, 0, 0],
-            [+1, 0, -l, 0],
-            [+1, 0, l, 0],
-            [+1, 0, 0, -l],
-            [+1, 0, 0, l],
+            [+1, -const_l, 0, 0],
+            [+1, const_l, 0, 0],
+            [+1, 0, -const_l, 0],
+            [+1, 0, const_l, 0],
+            [+1, 0, 0, -const_l],
+            [+1, 0, 0, const_l],
             [+1, 0, 0, 0]
         ]
-
-        append_to_list_x(norm_x, norm=1)
 
         delta_x1 = (x1_max - x1_min) / 2
         delta_x2 = (x2_max - x2_min) / 2
@@ -89,16 +95,17 @@ def main(m, n):
             [1, x1_min, x2_max, x3_min],
             [1, x1_max, x2_min, x3_min],
             [1, x1_max, x2_max, x3_max],
-            [1, -l * delta_x1 + x01, x02, x03],
-            [1, l * delta_x1 + x01, x02, x03],
-            [1, x01, -l * delta_x2 + x02, x03],
-            [1, x01, l * delta_x2 + x02, x03],
-            [1, x01, x02, -l * delta_x3 + x03],
-            [1, x01, x02, l * delta_x3 + x03],
+            [1, -const_l * delta_x1 + x01, x02, x03],
+            [1, const_l * delta_x1 + x01, x02, x03],
+            [1, x01, -const_l * delta_x2 + x02, x03],
+            [1, x01, const_l * delta_x2 + x02, x03],
+            [1, x01, x02, -const_l * delta_x3 + x03],
+            [1, x01, x02, const_l * delta_x3 + x03],
             [1, x01, x02, x03]
         ]
 
-        append_to_list_x(x, norm=1)
+        append_to_list_x(norm_x, variant=2)
+        append_to_list_x(x, variant=2)
 
     if n == 8:
         print(
@@ -115,27 +122,19 @@ def main(m, n):
             [+1, +1, +1, +1]
         ]
 
-        for i in range(len(norm_x)):
-            norm_x[i].append(norm_x[i][1] * norm_x[i][2])
-            norm_x[i].append(norm_x[i][1] * norm_x[i][3])
-            norm_x[i].append(norm_x[i][2] * norm_x[i][3])
-            norm_x[i].append(norm_x[i][1] * norm_x[i][2] * norm_x[i][3])
-
         x = [
-            [x1_min, x2_min, x3_min],
-            [x1_min, x2_max, x3_max],
-            [x1_max, x2_min, x3_max],
-            [x1_max, x2_max, x3_min],
-            [x1_min, x2_min, x3_max],
-            [x1_min, x2_max, x3_min],
-            [x1_max, x2_min, x3_min],
-            [x1_max, x2_max, x3_max]
+            [1, x1_min, x2_min, x3_min],
+            [1, x1_min, x2_max, x3_max],
+            [1, x1_max, x2_min, x3_max],
+            [1, x1_max, x2_max, x3_min],
+            [1, x1_min, x2_min, x3_max],
+            [1, x1_min, x2_max, x3_min],
+            [1, x1_max, x2_min, x3_min],
+            [1, x1_max, x2_max, x3_max]
         ]
-        for i in range(len(x)):
-            x[i].append(x[i][0] * x[i][1])
-            x[i].append(x[i][0] * x[i][2])
-            x[i].append(x[i][1] * x[i][2])
-            x[i].append(x[i][0] * x[i][1] * x[i][2])
+
+        append_to_list_x(norm_x, variant=1)
+        append_to_list_x(x, variant=1)
 
     if n == 4:
         print('ŷ = b0 + b1 * x1 + b2 * x2 + b3 * x3')
@@ -146,10 +145,10 @@ def main(m, n):
             [+1, +1, +1, -1],
         ]
         x = [
-            [x1_min, x2_min, x3_min],
-            [x1_min, x2_max, x3_max],
-            [x1_max, x2_min, x3_max],
-            [x1_max, x2_max, x3_min],
+            [1, x1_min, x2_min, x3_min],
+            [1, x1_min, x2_max, x3_max],
+            [1, x1_max, x2_min, x3_max],
+            [1, x1_max, x2_max, x3_min],
         ]
     y = np.random.randint(y_min, y_max, size=(n, m))
     y_av = list(np.average(y, axis=1))
@@ -158,194 +157,58 @@ def main(m, n):
         y_av[i] = round(y_av[i], 3)
 
     if n == 15:
-
         t = PrettyTable(['N', 'norm_x_0', 'norm_x_1', 'norm_x_2', 'norm_x_3', 'norm_x_1_x_2', 'norm_x_1_x_3',
                          'norm_x_2_x_3', 'norm_x_1_x_2_x_3', 'norm_x_1_x_1', 'norm_x_2_x_2', 'norm_x_3_x_3', 'x_0',
-                         'x_1', 'x_2', 'x_3', 'x_1_x_2', 'x_1_x_3', 'x_2_x_3',
-                         'x_1_x_2_x_3', 'x_1_x_1', 'x_2_x_2', 'x_3_x_3'] + [f'y_{i + 1}' for i in range(m)] + ['y_av'])
-
-        for i in range(n):
-            t.add_row([i + 1] + list(norm_x[i]) + list(x[i]) + list(y[i]) + [y_av[i]])
-        print(t)
-
-        # sums_of_columns_x = [round(i, 3) for i in np.sum(x, axis=0)]
-        # m_ij = [[n] + [i for i in sums_of_columns_x]]
-        # for i in range(len(x)):
-        #     x[i].insert(0, 1)
-        m_ij = []
-        for i in range(len(x[0])):
-            # a = [sums_of_columns_x[i]]
-            b = [round(sum([x[k][i] * x[k][j] for k in range(len(x))]), 3) for j in range(len(x[i]))]
-            m_ij.append(b)
-            # m_ij.append(
-            #     a + b
-            # )
-
-        ### ####
-        def a(first, second):  # first = 1, second = 2 : пошук а12
-            """Пошук коефіцієнтів а"""
-            need_a = 0
-            for j in range(N):
-                need_a += matrix_x[j][first - 1] * matrix_x[j][second - 1] / N
-            return need_a
-
-        def x(l1, l2, l3):
-            """Пошук зоряних точок"""
-            x_1 = l1 * delta_x1 + x01
-            x_2 = l2 * delta_x2 + x02
-            x_3 = l3 * delta_x3 + x03
-            return [x_1, x_2, x_3]
-
-        matrix_pfe = [
-            [-1, -1, -1, +1, +1, +1, -1, +1, +1, +1],
-            [-1, -1, +1, +1, -1, -1, +1, +1, +1, +1],
-            [-1, +1, -1, -1, +1, -1, +1, +1, +1, +1],
-            [-1, +1, +1, -1, -1, +1, -1, +1, +1, +1],
-            [+1, -1, -1, -1, -1, +1, +1, +1, +1, +1],
-            [+1, -1, +1, -1, +1, -1, -1, +1, +1, +1],
-            [+1, +1, -1, +1, -1, -1, -1, +1, +1, +1],
-            [+1, +1, +1, +1, +1, +1, +1, +1, +1, +1],
-            [-1.215, 0, 0, 0, 0, 0, 0, 1.4623, 0, 0],
-            [+1.215, 0, 0, 0, 0, 0, 0, 1.4623, 0, 0],
-            [0, -1.215, 0, 0, 0, 0, 0, 0, 1.4623, 0],
-            [0, +1.215, 0, 0, 0, 0, 0, 0, 1.4623, 0],
-            [0, 0, -1.215, 0, 0, 0, 0, 0, 0, 1.4623],
-            [0, 0, +1.215, 0, 0, 0, 0, 0, 0, 1.4623],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        ]
-        # Генеруєм матрицю ПЕ із натуралізованих значень
-        N = 15
-        matrix_x = [[] for x in range(N)]
-        for i in range(len(matrix_x)):
-            if i < 8:
-                x1 = x1_min if matrix_pfe[i][0] == -1 else x1_max
-                x2 = x2_min if matrix_pfe[i][1] == -1 else x2_max
-                x3 = x3_min if matrix_pfe[i][2] == -1 else x3_max
-            else:
-                x_lst = x(matrix_pfe[i][0], matrix_pfe[i][1], matrix_pfe[i][2])
-                x1, x2, x3 = x_lst
-            matrix_x[i] = [x1, x2, x3, x1 * x2, x1 * x3, x2 * x3, x1 * x2 * x3, x1 ** 2, x2 ** 2, x3 ** 2]
-
-        def find_average(lst, orientation):
-            """Функція пошуку середнього значення по колонках або по рядках"""
-            average = []
-            if orientation == 1:  # Середнє значення по рядку
-                for rows in range(len(lst)):
-                    average.append(sum(lst[rows]) / len(lst[rows]))
-            else:  # Середнє значення по колонкі
-                for column in range(len(lst[0])):
-                    number_lst = []
-                    for rows in range(len(lst)):
-                        number_lst.append(lst[rows][column])
-                    average.append(sum(number_lst) / len(number_lst))
-            return average
-
-        average_x = find_average(matrix_x, 0)  # Середні х по колонкам
-        mx_i = average_x  # Список середніх значень колонок [Mx1, Mx2, ...]
-        unknown = [
-            [1, mx_i[0], mx_i[1], mx_i[2], mx_i[3], mx_i[4], mx_i[5], mx_i[6], mx_i[7], mx_i[8], mx_i[9]],
-            [mx_i[0], a(1, 1), a(1, 2), a(1, 3), a(1, 4), a(1, 5), a(1, 6), a(1, 7), a(1, 8), a(1, 9), a(1, 10)],
-            [mx_i[1], a(2, 1), a(2, 2), a(2, 3), a(2, 4), a(2, 5), a(2, 6), a(2, 7), a(2, 8), a(2, 9), a(2, 10)],
-            [mx_i[2], a(3, 1), a(3, 2), a(3, 3), a(3, 4), a(3, 5), a(3, 6), a(3, 7), a(3, 8), a(3, 9), a(3, 10)],
-            [mx_i[3], a(4, 1), a(4, 2), a(4, 3), a(4, 4), a(4, 5), a(4, 6), a(4, 7), a(4, 8), a(4, 9), a(4, 10)],
-            [mx_i[4], a(5, 1), a(5, 2), a(5, 3), a(5, 4), a(5, 5), a(5, 6), a(5, 7), a(5, 8), a(5, 9), a(5, 10)],
-            [mx_i[5], a(6, 1), a(6, 2), a(6, 3), a(6, 4), a(6, 5), a(6, 6), a(6, 7), a(6, 8), a(6, 9), a(6, 10)],
-            [mx_i[6], a(7, 1), a(7, 2), a(7, 3), a(7, 4), a(7, 5), a(7, 6), a(7, 7), a(7, 8), a(7, 9), a(7, 10)],
-            [mx_i[7], a(8, 1), a(8, 2), a(8, 3), a(8, 4), a(8, 5), a(8, 6), a(8, 7), a(8, 8), a(8, 9), a(8, 10)],
-            [mx_i[8], a(9, 1), a(9, 2), a(9, 3), a(9, 4), a(9, 5), a(9, 6), a(9, 7), a(9, 8), a(9, 9), a(9, 10)],
-            [mx_i[9], a(10, 1), a(10, 2), a(10, 3), a(10, 4), a(10, 5), a(10, 6), a(10, 7), a(10, 8), a(10, 9),
-             a(10, 10)]
-        ]
-        k_i = []
-        for i in range(len(x[0])):
-            a = sum(y_av[j] * x[j][i] for j in range(len(x[i])))
-            k_i.append(a)
-        print('m_ij')
-        print(*m_ij, sep='\n')
-        print(f'{k_i}')
-        det = np.linalg.det(m_ij)
-        det_i = [np.linalg.det(replace_column(m_ij, i, k_i)) for i in range(len(k_i))]
-
-        b_i = [round(i / det, 3) for i in det_i]
-        # b_i = np.linalg.lstsq(x, y_av, rcond=None)[0]
-        # b_i = [round(i, 3) for i in b_i]
-
-        print(
-            f"\nThe naturalized regression equation: y = {b_i[0]:.5f} + {b_i[1]:.5f} * x1 + {b_i[2]:.5f} * x2 + "
-            f"{b_i[3]:.5f} * x3 + {b_i[4]:.5f} * x1 * x2 + "
-            f"{b_i[5]:.5f} * x1 * x3 + {b_i[6]:.5f} * x2 * x3 + {b_i[7]:.5f} * x1 * x2 * x3 + {b_i[8]:.5f} * x1 * x1 + "
-            f"{b_i[9]:.5f} * x2 * x2 + {b_i[10]:.5f} * x3 * x3")
-
-        check_i = [
-            b_i[0] + b_i[1] * i[1] + b_i[2] * i[2] + b_i[3] * i[3] + b_i[4] * i[4] + b_i[5] * i[5] +
-            b_i[6] * i[6] + b_i[7] * i[7] + b_i[8] * i[8] + b_i[9] * i[9] + b_i[10] * i[10] for i in x]
-
-        print("Values are naturalized: ", check_i)
+                         'x_1', 'x_2', 'x_3', 'x_1_x_2', 'x_1_x_3', 'x_2_x_3', 'x_1_x_2_x_3', 'x_1_x_1', 'x_2_x_2',
+                         'x_3_x_3'] + [f'y_{i + 1}' for i in range(m)] + ['y_av'])
 
     if n == 8:
         t = PrettyTable(['N', 'norm_x_0', 'norm_x_1', 'norm_x_2', 'norm_x_3', 'norm_x_1_x_2', 'norm_x_1_x_3',
-                         'norm_x_2_x_3', 'norm_x_1_x_2_x_3', 'x_1', 'x_2', 'x_3', 'x_1_x_2', 'x_1_x_3', 'x_2_x_3',
-                         'x_1_x_2_x_3'] + [f'y_{i + 1}' for i in range(m)] + ['y_av'])
-        for i in range(n):
-            t.add_row([i + 1] + list(norm_x[i]) + list(x[i]) + list(y[i]) + [y_av[i]])
-        print(t)
-        sums_of_columns_x = np.sum(x, axis=0)
-        m_ij = [[n] + [i for i in sums_of_columns_x]]
-        for i in range(len(sums_of_columns_x)):
-            m_ij.append(
-                [sums_of_columns_x[i]] + [sum([x[k][i] * x[k][j] for k in range(len(x[i]))]) for j in range(len(x[i]))])
-
-        k_i = [sum(y_av)]
-        for i in range(len(sums_of_columns_x)):
-            k_i.append(sum(y_av[j] * x[j][i] for j in range(len(x[i]))))
-
-        det = np.linalg.det(m_ij)
-        det_i = [np.linalg.det(replace_column(m_ij, i, k_i)) for i in range(len(k_i))]
-
-        b_i = [i / det for i in det_i]
-
-        print(
-            f"\nThe naturalized regression equation: y = {b_i[0]:.5f} + {b_i[1]:.5f} * x1 + {b_i[2]:.5f} * x2 + "
-            f"{b_i[3]:.5f} * x3 + {b_i[4]:.5f} * x1 * x2 + "
-            f"{b_i[5]:.5f} * x1 * x3 + {b_i[6]:.5f} * x2 * x3 + {b_i[7]:.5f} * x1 * x2 * x3")
-
+                         'norm_x_2_x_3', 'norm_x_1_x_2_x_3', 'x_0', 'x_1', 'x_2', 'x_3', 'x_1_x_2', 'x_1_x_3',
+                         'x_2_x_3', 'x_1_x_2_x_3'] + [f'y_{i + 1}' for i in range(m)] + ['y_av'])
     if n == 4:
         t = PrettyTable(
-            ['N', 'norm_x_0', 'norm_x_1', 'norm_x_2', 'norm_x_3', 'x_1', 'x_2', 'x_3'] + [f'y_{i + 1}' for i in
-                                                                                          range(m)] + ['y_av'])
-        for i in range(n):
-            t.add_row([i + 1] + list(norm_x[i]) + list(x[i]) + list(y[i]) + [y_av[i]])
-        print(t)
+            ['N', 'norm_x_0', 'norm_x_1', 'norm_x_2', 'norm_x_3', 'x_0', 'x_1', 'x_2', 'x_3'] +
+            [f'y_{i + 1}' for i in range(m)] + ['y_av'])
 
-        mx_1, mx_2, mx_3 = [i / len(x) for i in np.sum(x, axis=0)]
-        my = sum(y_av) / len(y_av)
+    for i in range(n):
+        t.add_row([i + 1] + list(norm_x[i]) + list(x[i]) + list(y[i]) + [y_av[i]])
+    print(t)
 
-        a_1 = sum([x[i][0] * y_av[i] for i in range(len(x))]) / len(x)
-        a_2 = sum([x[i][1] * y_av[i] for i in range(len(x))]) / len(x)
-        a_3 = sum([x[i][2] * y_av[i] for i in range(len(x))]) / len(x)
+    m_ij = []
+    for i in range(len(x[0])):
+        m_ij.append([round(sum([x[k][i] * x[k][j] for k in range(len(x))]) / 15, 3) for j in range(len(x[i]))])
 
-        a_11 = sum([x[i][0] ** 2 for i in range(len(x))]) / len(x)
-        a_22 = sum([x[i][1] ** 2 for i in range(len(x))]) / len(x)
-        a_33 = sum([x[i][2] ** 2 for i in range(len(x))]) / len(x)
-        a_12 = sum([x[i][0] * x[i][1] for i in range(len(x))]) / len(x)
-        a_13 = sum([x[i][0] * x[i][2] for i in range(len(x))]) / len(x)
-        a_23 = a_32 = sum([x[i][1] * x[i][2] for i in range(len(x))]) / len(x)
+    k_i = []
+    for i in range(len(x[0])):
+        a = sum(y_av[j] * x[j][i] for j in range(len(x))) / 15
+        k_i.append(a)
 
-        matrix = [
-            [1, mx_1, mx_2, mx_3],
-            [mx_1, a_11, a_12, a_13],
-            [mx_2, a_12, a_22, a_32],
-            [mx_3, a_13, a_23, a_33]
-        ]
+    det = np.linalg.det(m_ij)
+    det_i = [np.linalg.det(replace_column(m_ij, i, k_i)) for i in range(len(k_i))]
 
-        answers = [my, a_1, a_2, a_3]
-
-        det = np.linalg.det(matrix)
-        det_i = [np.linalg.det(replace_column(matrix, i, answers)) for i in range(len(answers))]
-
-        b_i = [i / det for i in det_i]
+    b_i = [round(i / det, 3) for i in det_i]
+    if n == 15:
         print(
-            f"\nThe naturalized regression equation: y = {b_i[0]:.5f} + {b_i[1]:.5f} * x1 + {b_i[2]:.5f} * x2 + {b_i[3]:.5f} * x3\n")
+            f"\nThe naturalized regression equation: "
+            f"y = {b_i[0]:.5f} + {b_i[1]:.5f} * x1 + {b_i[2]:.5f} * x2 + "
+            f"{b_i[3]:.5f} * x3 + {b_i[4]:.5f} * x1 * x2 + "
+            f"{b_i[5]:.5f} * x1 * x3 + {b_i[6]:.5f} * x2 * x3 + {b_i[7]:.5f} * x1 * x2 * x3 + {b_i[8]:.5f} * x1 * x1 + "
+            f"{b_i[9]:.5f} * x2 * x2 + {b_i[10]:.5f} * x3 * x3")
+    if n == 8:
+        print(
+            f"\nThe naturalized regression equation: "
+            f"y = {b_i[0]:.5f} + {b_i[1]:.5f} * x1 + {b_i[2]:.5f} * x2 + "
+            f"{b_i[3]:.5f} * x3 + {b_i[4]:.5f} * x1 * x2 + "
+            f"{b_i[5]:.5f} * x1 * x3 + {b_i[6]:.5f} * x2 * x3 + {b_i[7]:.5f} * x1 * x2 * x3")
+    if n == 4:
+        print(
+            f"\nThe naturalized regression equation: "
+            f"y = {b_i[0]:.5f} + {b_i[1]:.5f} * x1 + {b_i[2]:.5f} * x2 + {b_i[3]:.5f} * x3\n")
+
+    check_i = [round(sum(b_i[j] * i[j] for j in range(len(b_i))), 3) for i in x]
+    for i in range(len(check_i)):
+        print(f'ŷ{i + 1} = {check_i[i]}, y_av{i + 1} = {y_av[i]}')
 
     print("\n[ Kohren's test ]")
     f_1 = m - 1
@@ -360,7 +223,7 @@ def main(m, n):
     if g_p < g_t:
         print(f"The variance is homogeneous: Gp = {g_p:.5} < Gt = {g_t}")
     else:
-        print(f"The variance is not homogeneous Gp = {g_p:.5} < Gt = {g_t}\nStart again with m = m + 1")
+        print(f"The variance is not homogeneous Gp = {g_p:.5} < Gt = {g_t}\nStart again with m = m + 1 = {m + 1}")
         return main(m=m + 1, n=n)
 
     print("\n[ Student's test ]")
@@ -388,36 +251,33 @@ def main(m, n):
     if n == d:
         n = 8 if n == 4 else 15
         print(f"n=d\nStart again with n = {n}")
-        main(m=m + 1, n=n)
+        return main(m=m + 1, n=n)
     if n == 15:
         print(
-            f"\nThe naturalized simplified regression equation: y = {beta_i[0]:.5f} + {beta_i[1]:.5f} * x1 + "
+            f"\nThe naturalized simplified regression equation: "
+            f"y = {beta_i[0]:.5f} + {beta_i[1]:.5f} * x1 + "
             f"{beta_i[2]:.5f} * x2 + {beta_i[3]:.5f} * x3 + {beta_i[4]:.5f} * x1 * x2 + "
             f"{beta_i[5]:.5f} * x1 * x3 + {beta_i[6]:.5f} * x2 * x3 + {beta_i[7]:.5f} * x1 * x2 * x3 + "
             f"{beta_i[8]:.5f} * x1 * x1 + {beta_i[9]:.5f} * x2 * x2 + {beta_i[10]:.5f} * x3 * x3")
+        check_i = [round(sum(beta_i[j] * i[j] for j in range(len(beta_i))), 3) for i in x]
 
-        check_i = [
-            beta_i[0] + beta_i[1] * i[1] + beta_i[2] * i[2] + beta_i[3] * i[3] + beta_i[4] * i[4] + beta_i[5] * i[5] +
-            beta_i[6] * i[6] + beta_i[7] * i[7] + beta_i[8] * i[8] + beta_i[9] * i[9] + beta_i[10] * i[10] for i in x]
-
-        print("Values are normalized: ", check_i)
     if n == 8:
         print(
-            f"\nThe normalized regression equation: y = {beta_i[0]:.5f} + {beta_i[1]:.5f} * x1 + {beta_i[2]:.5f} * x2 + "
+            f"\nThe normalized regression equation: "
+            f"y = {beta_i[0]:.5f} + {beta_i[1]:.5f} * x1 + {beta_i[2]:.5f} * x2 + "
             f"{beta_i[3]:.5f} * x3 + {beta_i[4]:.5f} * x1 * x2 + "
             f"{beta_i[5]:.5f} * x1 * x3 + {beta_i[6]:.5f} * x2 * x3 + {beta_i[7]:.5f} * x1 * x2 * x3")
-        check_i = [
-            beta_i[0] + beta_i[1] * i[0] + beta_i[2] * i[1] + beta_i[3] * i[2] + beta_i[4] * i[3] + beta_i[5] * i[4] +
-            beta_i[6] * i[5] + beta_i[7] * i[6] for i in norm_x]
-        print("Values are normalized: ", check_i)
+        check_i = [round(sum(beta_i[j] * i[j] for j in range(len(beta_i))), 3) for i in norm_x]
 
     if n == 4:
         print(
-            f"\nThe normalized regression equation: y = {beta_i[0]:.5f} + {beta_i[1]:.5f} * x1 + {beta_i[2]:.5f} * x2 + "
+            f"\nThe normalized regression equation: "
+            f"y = {beta_i[0]:.5f} + {beta_i[1]:.5f} * x1 + {beta_i[2]:.5f} * x2 + "
             f"{beta_i[3]:.5f} * x3")
-        check_i = [
-            beta_i[0] + beta_i[1] * i[0] + beta_i[2] * i[1] + beta_i[3] * i[2] for i in norm_x]
-        print("Values are normalized: ", check_i)
+        check_i = [round(sum(beta_i[j] * i[j] for j in range(len(beta_i))), 3) for i in norm_x]
+
+    for i in range(len(check_i)):
+        print(f'ŷ{i + 1} = {check_i[i]}, y_av{i + 1} = {y_av[i]}')
 
     print("\n[ Fisher's test ]")
     f_4 = n - d
@@ -456,13 +316,15 @@ def main(m, n):
     if f_p > get_value(f_t, f_3)[f_4]:
         n = 8 if n == 4 else 15
         print(
-            f"fp = {f_p} > ft = {get_value(f_t, f_3)[f_4]}.\nThe mathematical model is not adequate to the experimental "
-            f"data\nStart again with m = m + 1 = {m + 1} and n = {n}")
-        main(m=m + 1, n=n)
+            f"fp = {f_p} > ft = {get_value(f_t, f_3)[f_4]}.\n"
+            f"The mathematical model is not adequate to the experimental data\n"
+            f"Start again with m = m + 1 = {m + 1} and n = {n}")
+        return main(m=m + 1, n=n)
     else:
         print(
-            f"fP = {f_p} < fT = {get_value(f_t, f_3)[f_4]}.\nThe mathematical model is adequate to the experimental data\n")
+            f"fP = {f_p} < fT = {get_value(f_t, f_3)[f_4]}.\n"
+            f"The mathematical model is adequate to the experimental data\n")
 
 
-# main(m=3, n=4)
+# n = 15 because if you start with 4 then it will not reach 15
 main(m=3, n=15)
