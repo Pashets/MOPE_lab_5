@@ -24,13 +24,13 @@ def replace_column(list_: list, column, list_replace):
 
 
 def append_to_list_x(x: list, variant: int):
-    if variant == 1:
+    if variant == 1: # Conducting an experiment using a regression equation taking into account the interaction effect
         for i in range(len(x)):
             x[i].append(x[i][1] * x[i][2])
             x[i].append(x[i][1] * x[i][3])
             x[i].append(x[i][2] * x[i][3])
             x[i].append(x[i][1] * x[i][2] * x[i][3])
-    if variant == 2:
+    if variant == 2: # Conducting an experiment using a regression equation with quadratic terms.
         for i in range(len(x)):
             x[i].append(x[i][1] * x[i][2])
             x[i].append(x[i][1] * x[i][3])
